@@ -1,0 +1,37 @@
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.dylib
+*.dll
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Local env
+.venv/
+venv/
+
+# Blender
+*.blend1
+*.blend2
+*.blend@
+
+# Build outputs
+dist/
+build/
+**/build/
+
+# Packaged artifacts / bundled binaries (prefer GitHub Releases or CI artifacts)
+blender_addon/wheels/*.whl
+blender_addon/ando/ando_barrier_core.*
+blender_addon/ando/ando_barrier_core*.so
+
+# IDE
+.vscode/
