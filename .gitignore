@@ -28,10 +28,15 @@ dist/
 build/
 **/build/
 
-# Packaged artifacts / bundled binaries (prefer GitHub Releases or CI artifacts)
-blender_addon/wheels/*.whl
-blender_addon/ando/ando_barrier_core.*
-blender_addon/ando/ando_barrier_core*.so
+# Allow publishing the bundled runtime artifacts for the Blender Extension.
+# (Still keeps other build outputs and caches ignored.)
+!blender_addon/wheels/*.whl
+!blender_addon/ando/ando_barrier_core.py
+!blender_addon/ando/ando_barrier_core*.so
+
+# Optionally publish the built extension zip from dist/
+!dist/
+!dist/*.zip
 
 # IDE
 .vscode/
