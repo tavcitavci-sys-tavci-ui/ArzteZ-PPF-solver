@@ -129,7 +129,13 @@ If you need to rebuild it locally, you’ll need:
 - `maturin`
 - A working CUDA/NVIDIA environment compatible with the upstream solver
 
-(Repo used in this workspace: `ppf_cts_backend_build/`.)
+This repo vendors the wheel wrapper source in `ppf_cts_backend/`.
+
+Build and copy the wheel into the extension:
+- `tools/build_ppf_wheel.sh`
+
+Then rebuild the extension zip:
+- `./build.sh`
 
 ## License
 

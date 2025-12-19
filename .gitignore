@@ -28,6 +28,9 @@ dist/
 build/
 **/build/
 
+# Rust / maturin build outputs
+ppf_cts_backend/target/
+
 # Allow publishing the bundled runtime artifacts for the Blender Extension.
 # (Still keeps other build outputs and caches ignored.)
 !blender_addon/wheels/*.whl

@@ -21,6 +21,13 @@ It bundles two simulation backends:
 - Linux x64
 - Blender Python 3.11 (bundled artifacts are `cp311`)
 
+## Rebuilding the PPF wheel (Maintainers)
+
+If you need to rebuild the bundled `ppf_cts_backend` wheel, the wrapper source is vendored in the repo root under `ppf_cts_backend/`.
+
+- Build + copy wheel into `blender_addon/wheels/`: `tools/build_ppf_wheel.sh`
+- Rebuild the extension zip: `./build.sh`
+
 ## Troubleshooting
 
 - If PPF fails with `PPF step failed: failed to advance`, inspect traces in:
