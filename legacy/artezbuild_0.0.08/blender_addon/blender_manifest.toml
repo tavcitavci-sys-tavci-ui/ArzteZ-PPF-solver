@@ -1,0 +1,17 @@
+schema_version = "1.0.0"
+id = "andosim_artezbuild"
+version = "0.0.08"
+name = "AndoSim ArteZbuild"
+tagline = "Unified Ando (CPU) + PPF (GPU) simulation"
+maintainer = "Moritz"
+type = "add-on"
+blender_version_min = "4.2.0"
+license = ["MIT"]
+
+platforms = ["linux-x64"]
+
+permissions = { files = "Export temporary PPF scenes and write cache/output" }
+
+wheels = [
+	"./wheels/ppf_cts_backend-0.0.5-cp311-cp311-manylinux_2_34_x86_64.whl",
+]
