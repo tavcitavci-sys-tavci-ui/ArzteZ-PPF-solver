@@ -13,7 +13,9 @@ ando_core_src/**/cmake_install.cmake
 ando_core_src/**/Makefile
 
 # Packaging artifacts
-dist/
+# Keep the folder ignored by default, but allow committing release zips.
+dist/**
+!dist/*.zip
 
 # Exclude vendored/experimental sources (not part of release repo)
 arcsim/
