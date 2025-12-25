@@ -1,0 +1,14 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "ppf_cts_backend"
+version = "0.0.5"
+description = "PPF CTS in-process backend (PyO3)"
+requires-python = ">=3.11"
+
+[tool.maturin]
+python-source = "python"
+module-name = "ppf_cts_backend._core"
+features = ["pyo3/extension-module"]

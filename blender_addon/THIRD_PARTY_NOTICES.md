@@ -1,5 +1,7 @@
 # Third-Party Notices
 
+This extension is licensed under **GPL-3.0-or-later**. See `LICENSE`.
+
 This Blender Extension bundles and/or builds on third-party open source projects.
 
 ## AndoSim

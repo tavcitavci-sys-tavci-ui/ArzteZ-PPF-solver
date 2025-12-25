@@ -1,14 +1,14 @@
 # AndoSim ArteZbuild — Install & Quick Start (ZIP)
 
 This guide assumes you already have the extension zip:
-- `andosim_artezbuild-0.0.8.zip`
+- `andosim_artezbuild-0.0.9.2.zip`
 
 ## Install
 
 1. Open Blender (4.2+).
 2. Go to **Edit → Preferences → Extensions**.
 3. Click **Install from Disk…**
-4. Select `andosim_artezbuild-0.0.8.zip`.
+4. Select `andosim_artezbuild-0.0.9.2.zip`.
 5. After it installs, **enable** the extension (toggle on).
 
 If you updated the zip and Blender still behaves like an older version:
@@ -30,7 +30,11 @@ If you updated the zip and Blender still behaves like an older version:
 4. In **AndoSim → PPF → Scene**, set **Output Dir** (recommended).
 5. Press **Run**.
 
-If the PPF panel shows `ppf_cts_backend missing`, the extension is not installed/enabled correctly (it must be installed from the zip as an Extension).
+If the PPF panel shows `ppf_cts_backend missing`, either:
+- the extension is not installed/enabled correctly (it must be installed from the zip as an Extension), or
+- your Blender Python ABI doesn't match the bundled wheel (this zip currently bundles a `cp311` wheel).
+
+To check your Blender Python version: open Blender's Python console and run `import sys; sys.version`.
 
 ## Quick Start (Ando / CPU)
 

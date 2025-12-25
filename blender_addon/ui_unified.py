@@ -92,129 +92,186 @@ class ANDOSIM_ARTEZBUILD_PT_ppf_panel(bpy.types.Panel):
             version = getattr(backend_or_exc, "__version__", "?")
             status.label(text=f"ppf_cts_backend OK: {version}", icon="CHECKMARK")
 
-        controls = layout.row(align=True)
-        controls.operator("andosim_artezbuild.ppf_run", text="Run", icon="PLAY")
-        controls.operator("andosim_artezbuild.ppf_stop", text="Stop", icon="PAUSE")
+        def _section(parent, prop_name: str, title: str, icon: str):
+            box = parent.box()
+            row = box.row(align=True)
+            opened = bool(getattr(settings, prop_name, False))
+            row.prop(settings, prop_name, text="", emboss=False, icon="TRIA_DOWN" if opened else "TRIA_RIGHT")
+            row.label(text=title, icon=icon)
+            return box, opened
 
-        general = layout.box()
-        general.label(text="Scene", icon="SCENE_DATA")
-        general.prop(settings, "auto_export")
-        general.prop(settings, "use_selected_colliders")
-        general.prop(settings, "scene_path")
-        general.prop(settings, "output_dir")
-        general.prop(settings, "target_object")
-        general.prop(settings, "fps")
+        realtime_box, realtime_open = _section(layout, "ppf_ui_show_realtime", "Realtime", "TIME")
+        if realtime_open:
+            controls = realtime_box.row(align=True)
+            controls.operator("andosim_artezbuild.ppf_run", text="Run", icon="PLAY")
+            controls.operator("andosim_artezbuild.ppf_stop", text="Stop", icon="PAUSE")
+            reset_row = controls.row(align=True)
+            reset_row.enabled = bool(getattr(settings, "ppf_has_snapshot", False)) and not bool(
+                getattr(settings, "ppf_baking", False)
+            )
+            reset_row.operator("andosim_artezbuild.ppf_reset_simulation", text="Reset Simulation", icon="LOOP_BACK")
 
-        bake = general.row(align=True)
-        bake.operator("andosim_artezbuild.ppf_bake_cache", text="Bake Cache", icon="FILE_TICK")
+        bake_box, bake_open = _section(layout, "ppf_ui_show_bake", "Bake", "FILE_TICK")
+        if bake_open:
+            bake_box.use_property_split = True
+            bake_box.use_property_decorate = False
+            bake_box.prop(settings, "auto_export")
+            bake_box.prop(settings, "use_selected_colliders")
+            bake_box.prop(settings, "scene_path")
+            bake_box.prop(settings, "output_dir")
+            bake_box.prop(settings, "target_object")
+            bake_box.prop(settings, "fps")
 
-        box = layout.box()
-        box.label(text="Material Preset", icon="MATERIAL")
-        box.prop(settings, "ppf_material_preset")
+            bake = bake_box.row(align=True)
+            if bool(getattr(settings, "ppf_baking", False)):
+                bake.operator("andosim_artezbuild.ppf_cancel_bake", text="Cancel", icon="CANCEL")
+            else:
+                bake.operator("andosim_artezbuild.ppf_bake_cache", text="Bake Cache", icon="FILE_TICK")
 
-        sim = layout.box()
-        sim.label(text="Simulation", icon="TIME")
-        sim.prop(settings, "dt")
-        sim.prop(settings, "solver_fps")
-        sim.prop(settings, "gravity")
+        settings_box, settings_open = _section(layout, "ppf_ui_show_settings", "Settings", "SETTINGS")
+        if settings_open:
+            box = settings_box.box()
+            box.label(text="Material Preset", icon="MATERIAL")
+            box.prop(settings, "ppf_material_preset")
 
-        shell = layout.box()
-        shell.label(text="Shell", icon="MOD_CLOTH")
-        shell.prop(settings, "tri_model")
-        shell.prop(settings, "tri_density")
-        shell.prop(settings, "tri_young_mod")
-        shell.prop(settings, "tri_poiss_rat")
-        shell.prop(settings, "tri_bend")
-        shell.prop(settings, "tri_shrink")
-        shell.prop(settings, "tri_contact_gap")
-        shell.prop(settings, "tri_contact_offset")
-        shell.prop(settings, "tri_strain_limit")
-        shell.prop(settings, "tri_friction")
+            sim_box, sim_open = _section(settings_box, "ppf_ui_show_sim", "Simulation", "TIME")
+            if sim_open:
+                sim_box.prop(settings, "dt")
+                sim_box.prop(settings, "solver_fps")
+                sim_box.prop(settings, "gravity")
 
-        stat = layout.box()
-        stat.label(text="Static Collider", icon="CUBE")
-        stat.prop(settings, "static_contact_gap")
-        stat.prop(settings, "static_contact_offset")
-        stat.prop(settings, "static_friction")
+            shell_box, shell_open = _section(settings_box, "ppf_ui_show_shell", "Shell", "MOD_CLOTH")
+            if shell_open:
+                shell_box.prop(settings, "tri_model")
+                shell_box.prop(settings, "tri_density")
+                shell_box.prop(settings, "tri_young_mod")
+                shell_box.prop(settings, "tri_poiss_rat")
+                shell_box.prop(settings, "tri_bend")
+                shell_box.prop(settings, "tri_shrink")
+                shell_box.prop(settings, "tri_contact_gap")
+                shell_box.prop(settings, "tri_contact_offset")
+                shell_box.prop(settings, "tri_strain_limit")
+                shell_box.prop(settings, "tri_friction")
 
-        obj = context.object
-        obj_box = layout.box()
-        obj_box.label(text="Active Object", icon="OUTLINER_OB_MESH")
-        if obj is None:
-            obj_box.label(text="Select a mesh object to edit PPF role/pins", icon="INFO")
-            return
-        if obj.type != "MESH":
-            obj_box.label(text=f"Active object '{obj.name}' is not a mesh", icon="INFO")
-            return
+            stat_box, stat_open = _section(settings_box, "ppf_ui_show_static", "Static Collider", "CUBE")
+            if stat_open:
+                stat_box.prop(settings, "static_contact_gap")
+                stat_box.prop(settings, "static_contact_offset")
+                stat_box.prop(settings, "static_friction")
 
-        props = getattr(obj, "andosim_artezbuild", None)
-        if props is None:
-            obj_box.label(text="Object settings not initialized", icon="ERROR")
-            return
+            obj_box, obj_open = _section(settings_box, "ppf_ui_show_active_object", "Active Object", "OUTLINER_OB_MESH")
+            if obj_open:
+                obj = context.object
+                if obj is None:
+                    obj_box.label(text="Select a mesh object to edit PPF role/pins", icon="INFO")
+                    return
+                if obj.type != "MESH":
+                    obj_box.label(text=f"Active object '{obj.name}' is not a mesh", icon="INFO")
+                    return
 
-        col = obj_box.column(align=True)
-        col.prop(props, "enabled")
-        row = col.row(align=True)
-        row.enabled = bool(getattr(props, "enabled", False))
-        row.prop(props, "role")
+                props = getattr(obj, "andosim_artezbuild", None)
+                if props is None:
+                    obj_box.label(text="Object settings not initialized", icon="ERROR")
+                    return
 
-        if not bool(getattr(props, "enabled", False)) or getattr(props, "role", "IGNORE") == "IGNORE":
-            obj_box.label(text="Enable the object to include it in export", icon="INFO")
-            return
+                col = obj_box.column(align=True)
+                col.prop(props, "enabled")
+                row = col.row(align=True)
+                row.enabled = bool(getattr(props, "enabled", False))
+                row.prop(props, "role")
 
-        role = getattr(props, "role", "DEFORMABLE")
+                if not bool(getattr(props, "enabled", False)) or getattr(props, "role", "IGNORE") == "IGNORE":
+                    obj_box.label(text="Enable the object to include it in export", icon="INFO")
+                    return
 
-        # Per-object overrides
-        obj_box.separator()
-        obj_box.prop(props, "use_object_params")
-        if bool(getattr(props, "use_object_params", False)):
-            if role == "DEFORMABLE":
-                o = obj_box.box()
-                o.label(text="Deformable Override", icon="MOD_CLOTH")
-                o.prop(props, "tri_model")
-                o.prop(props, "tri_density")
-                o.prop(props, "tri_young_mod")
-                o.prop(props, "tri_poiss_rat")
-                o.prop(props, "tri_bend")
-                o.prop(props, "tri_shrink")
-                o.prop(props, "tri_contact_gap")
-                o.prop(props, "tri_contact_offset")
-                o.prop(props, "tri_strain_limit")
-                o.prop(props, "tri_friction")
-            elif role == "STATIC_COLLIDER":
-                o = obj_box.box()
-                o.label(text="Static Collider Override", icon="CUBE")
-                o.prop(props, "static_contact_gap")
-                o.prop(props, "static_contact_offset")
-                o.prop(props, "static_friction")
+                role = getattr(props, "role", "DEFORMABLE")
 
-        # Pins / stitches only apply to deformables.
-        if role == "DEFORMABLE":
-            pins = obj_box.box()
-            pins.label(text="Pins", icon="PINNED")
-            row = pins.row(align=True)
-            row.operator("andosim_artezbuild.ppf_create_pin_handle", text="Create Pin Handle")
-            row.operator("andosim_artezbuild.ppf_clear_grab", text="Clear Handles")
-            pins.prop(props, "pin_enabled")
-            if bool(getattr(props, "pin_enabled", False)):
-                pins.prop(props, "pin_vertex_group")
-                pins.prop(props, "pin_pull_strength")
+                override_box, override_open = _section(obj_box, "ppf_ui_show_object_override", "Object Override", "MODIFIER")
+                if override_open:
+                    override_box.prop(props, "use_object_params")
+                    if bool(getattr(props, "use_object_params", False)):
+                        if role == "DEFORMABLE":
+                            o = override_box.box()
+                            o.label(text="Deformable Override", icon="MOD_CLOTH")
+                            o.prop(props, "tri_model")
+                            o.prop(props, "tri_density")
+                            o.prop(props, "tri_young_mod")
+                            o.prop(props, "tri_poiss_rat")
+                            o.prop(props, "tri_bend")
+                            o.prop(props, "tri_shrink")
+                            o.prop(props, "tri_contact_gap")
+                            o.prop(props, "tri_contact_offset")
+                            o.prop(props, "tri_strain_limit")
+                            o.prop(props, "tri_friction")
+                        elif role == "STATIC_COLLIDER":
+                            o = override_box.box()
+                            o.label(text="Static Collider Override", icon="CUBE")
+                            o.prop(props, "static_contact_gap")
+                            o.prop(props, "static_contact_offset")
+                            o.prop(props, "static_friction")
 
-            pins.separator(factor=0.5)
-            pins.prop(props, "attach_enabled")
-            if bool(getattr(props, "attach_enabled", False)):
-                pins.prop(props, "attach_target_object")
-                pins.prop(props, "attach_vertex_group")
-                pins.prop(props, "attach_pull_strength")
+                # Pins / stitches only apply to deformables.
+                if role == "DEFORMABLE":
+                    pins_box, pins_open = _section(obj_box, "ppf_ui_show_pins", "Pins", "PINNED")
+                    if pins_open:
+                        row = pins_box.row(align=True)
+                        row.operator("andosim_artezbuild.ppf_create_pin_handle", text="Create Pin Handle")
+                        row.operator("andosim_artezbuild.ppf_clear_grab", text="Clear Handles")
 
-            stitch = obj_box.box()
-            stitch.label(text="Stitches", icon="LINKED")
-            stitch.prop(props, "stitch_enabled")
-            if bool(getattr(props, "stitch_enabled", False)):
-                stitch.prop(props, "stitch_target_object")
-                stitch.prop(props, "stitch_source_vertex_group")
-                stitch.prop(props, "stitch_target_vertex_group")
-                stitch.prop(props, "stitch_max_distance")
+                        prep_box, prep_open = _section(pins_box, "ppf_ui_show_cloth_prep", "Cloth Prep", "MOD_REMESH")
+                        if prep_open:
+                            prep_box.prop(settings, "cloth_prep_voxel_size")
+                            prep_box.prop(settings, "cloth_prep_adaptivity")
+                            prep_box.prop(settings, "cloth_prep_merge_distance")
+                            prep_box.prop(settings, "cloth_prep_auto_voxel_from_shell")
+                            prep_box.prop(settings, "cloth_prep_report_mesh_quality")
+                            prep_box.prop(settings, "cloth_prep_contact_gap_mode")
+                            if getattr(settings, "cloth_prep_contact_gap_mode", "OFF") != "OFF":
+                                prep_box.prop(settings, "cloth_prep_contact_gap_factor")
+                            prep_box.prop(settings, "cloth_prep_dt_mode")
+                            if getattr(settings, "cloth_prep_dt_mode", "OFF") != "OFF":
+                                prep_box.prop(settings, "cloth_prep_dt_max_gravity_disp_frac")
+
+                            run_row = prep_box.row(align=True)
+                            op = run_row.operator(
+                                "andosim_artezbuild.prepare_cloth_mesh",
+                                text="Prepare Cloth Mesh",
+                                icon="MOD_REMESH",
+                            )
+                            # Drive the operator from persistent UI settings.
+                            try:
+                                op.voxel_size = float(getattr(settings, "cloth_prep_voxel_size", 0.0))
+                                op.adaptivity = float(getattr(settings, "cloth_prep_adaptivity", 0.0))
+                                op.merge_distance = float(getattr(settings, "cloth_prep_merge_distance", 1.0e-6))
+                                op.auto_voxel_from_shell = bool(getattr(settings, "cloth_prep_auto_voxel_from_shell", True))
+                                op.report_mesh_quality = bool(getattr(settings, "cloth_prep_report_mesh_quality", True))
+                                op.contact_gap_mode = str(getattr(settings, "cloth_prep_contact_gap_mode", "SUGGEST"))
+                                op.contact_gap_factor = float(getattr(settings, "cloth_prep_contact_gap_factor", 0.1))
+                                op.dt_mode = str(getattr(settings, "cloth_prep_dt_mode", "SUGGEST"))
+                                op.dt_max_gravity_disp_frac = float(getattr(settings, "cloth_prep_dt_max_gravity_disp_frac", 0.1))
+                            except Exception:
+                                pass
+
+                        pins_box.prop(props, "pin_enabled")
+                        if bool(getattr(props, "pin_enabled", False)):
+                            pins_box.prop(props, "pin_vertex_group")
+                            pins_box.prop(props, "pin_pull_strength")
+
+                        pins_box.separator(factor=0.5)
+                        pins_box.prop(props, "attach_enabled")
+                        if bool(getattr(props, "attach_enabled", False)):
+                            pins_box.prop(props, "attach_target_object")
+                            pins_box.prop(props, "attach_vertex_group")
+                            pins_box.prop(props, "attach_pull_strength")
+
+                        stitch = pins_box.box()
+                        stitch.label(text="Stitches", icon="LINKED")
+                        stitch.prop(props, "stitch_enabled")
+                        if bool(getattr(props, "stitch_enabled", False)):
+                            stitch.prop(props, "stitch_target_object")
+                            stitch.prop(props, "stitch_source_vertex_group")
+                            stitch.prop(props, "stitch_target_vertex_group")
+                            stitch.prop(props, "stitch_max_distance")
 
 
 _classes = (

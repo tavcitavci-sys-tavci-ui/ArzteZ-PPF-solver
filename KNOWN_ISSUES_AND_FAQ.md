@@ -1,4 +1,4 @@
-# AndoSim ArteZbuild 0.0.8 — Known Issues & FAQ
+# AndoSim ArteZbuild 0.0.9.2 — Known Issues & FAQ
 
 This document tracks common problems and practical workarounds for the unified AndoSim (CPU) + PPF (GPU) Blender Extension.
 
@@ -62,11 +62,12 @@ This document tracks common problems and practical workarounds for the unified A
 
 **Cause**
 - Native module ABI mismatch: Blender’s bundled Python version must match the compiled extension’s ABI.
-  - Example: Blender 4.5 uses Python 3.11 → the module must be `cpython-311-...`.
+  - Example: Blender 4.2 uses Python 3.11 → the module must be `cpython-311-...`.
+  - Newer Blender versions may ship a newer Python (e.g. 3.12), which requires a matching `cpython-312-...` build.
 
 **Fix**
 - Rebuild the extension zip using the repo build script:
-  - Run `./build.sh` in `artezbuild_0.0.06/`.
+  - Run `./build.sh` from the repo root.
 - Verify the zip contains a `cpython-311` binary:
   - `ando/ando_barrier_core.cpython-311-...so`
 
@@ -79,16 +80,20 @@ This document tracks common problems and practical workarounds for the unified A
 **Cause**
 - Wheels are only activated when Blender installs/enables the add-on as an **Extension**.
 - Importing from the source tree (or running scripts directly from the repo) won’t automatically add bundled wheels to `sys.path`.
+- **Python ABI mismatch**: this release bundles a **cp311** wheel (`ppf_cts_backend-...-cp311-...whl`).
+  - If your Blender ships Python **3.12** (common in newer Blender versions), the cp311 wheel cannot be imported.
 
 **Fix**
 - Install from the built zip:
-  - Blender → Preferences → Extensions → Install from Disk… → select `dist/andosim_artezbuild-0.0.8.zip`.
+  - Blender → Preferences → Extensions → Install from Disk… → select `dist/andosim_artezbuild-0.0.9.2.zip`.
+- If Blender is using Python 3.12+:
+  - Build and bundle a matching `ppf_cts_backend-...-cp312-...whl`, or use a Blender build that ships Python 3.11.
 
 ---
 
 ### 5) No way to mark deformables/colliders/pins in UI
 **Status**
-- Fixed in 0.0.06 workspace: the unified PPF panel now exposes the same “Active Object” controls as the original PPF artezbuild add-on.
+- Fixed in 0.0.9.2: the unified PPF panel exposes the same “Active Object” controls as the original PPF artezbuild add-on.
 
 **Where**
 - View3D → Sidebar → **AndoSim** → **PPF** → **Active Object**

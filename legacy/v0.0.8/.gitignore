@@ -1,0 +1,49 @@
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.dylib
+*.dll
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Local env
+.venv/
+venv/
+
+# Blender
+*.blend1
+*.blend2
+*.blend@
+
+# Build outputs
+dist/
+build/
+**/build/
+
+# Rust / maturin build outputs
+ppf_cts_backend/target/
+ppf-contact-solver/target/
+
+# Keep Cargo.lock tracked for reproducible builds
+!ppf-contact-solver/Cargo.lock
+
+# Allow publishing the bundled runtime artifacts for the Blender Extension.
+# (Still keeps other build outputs and caches ignored.)
+!blender_addon/wheels/*.whl
+!blender_addon/ando/ando_barrier_core.py
+!blender_addon/ando/ando_barrier_core*.so
+
+# Optionally publish the built extension zip from dist/
+!dist/
+!dist/*.zip
+
+# IDE
+.vscode/

@@ -72,6 +72,161 @@ def _apply_ppf_material_preset(self, _context):
 
 
 class AndoSimArtezbuildSettings(bpy.types.PropertyGroup):
+    ppf_ui_show_realtime: bpy.props.BoolProperty(
+        name="Realtime",
+        description="Show realtime controls",
+        default=True,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_bake: bpy.props.BoolProperty(
+        name="Bake",
+        description="Show bake controls",
+        default=False,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_settings: bpy.props.BoolProperty(
+        name="Settings",
+        description="Show solver/object settings",
+        default=False,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_sim: bpy.props.BoolProperty(
+        name="Simulation",
+        description="Show simulation settings",
+        default=True,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_shell: bpy.props.BoolProperty(
+        name="Shell",
+        description="Show shell material settings",
+        default=True,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_static: bpy.props.BoolProperty(
+        name="Static Collider",
+        description="Show static collider settings",
+        default=False,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_active_object: bpy.props.BoolProperty(
+        name="Active Object",
+        description="Show active object role/pins settings",
+        default=True,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_object_override: bpy.props.BoolProperty(
+        name="Object Override",
+        description="Show per-object override parameters",
+        default=False,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_pins: bpy.props.BoolProperty(
+        name="Pins",
+        description="Show pin/attach/stitch settings",
+        default=True,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_ui_show_cloth_prep: bpy.props.BoolProperty(
+        name="Cloth Prep",
+        description="Show cloth remesh/prep settings",
+        default=False,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    # ---------------------------------------------------------------------
+    # Cloth Prep (Prepare Cloth Mesh operator) persistent defaults
+    # ---------------------------------------------------------------------
+
+    cloth_prep_voxel_size: bpy.props.FloatProperty(
+        name="Voxel Size",
+        description="Remesh voxel size (0 = auto based on object size)",
+        default=0.0,
+        min=0.0,
+        soft_min=0.0,
+        soft_max=1.0,
+        precision=6,
+    )
+
+    cloth_prep_merge_distance: bpy.props.FloatProperty(
+        name="Merge Distance",
+        description="Merge-by-distance threshold used during cleanup (0 = off)",
+        default=1.0e-6,
+        min=0.0,
+        precision=8,
+    )
+
+    cloth_prep_adaptivity: bpy.props.FloatProperty(
+        name="Adaptivity",
+        description="Remesh adaptivity (0 = uniform). Higher can reduce polycount but may introduce size variance",
+        default=0.0,
+        min=0.0,
+        max=1.0,
+        precision=3,
+    )
+
+    cloth_prep_auto_voxel_from_shell: bpy.props.BoolProperty(
+        name="Auto from Shell Model",
+        description="When voxel size is 0, bias the auto voxel size based on the selected PPF shell settings",
+        default=True,
+    )
+
+    cloth_prep_report_mesh_quality: bpy.props.BoolProperty(
+        name="Report Mesh Quality",
+        description="Compute triangle quality stats after remeshing and warn if the mesh is likely to be unstable",
+        default=True,
+    )
+
+    cloth_prep_contact_gap_mode: bpy.props.EnumProperty(
+        name="Contact Gap",
+        description="Suggest (or apply) a contact gap based on the remeshed median edge length",
+        items=[
+            ("OFF", "Off", "Do not compute a contact-gap suggestion"),
+            ("SUGGEST", "Suggest", "Report a suggested contact gap without changing settings"),
+            ("SET", "Set", "Write the suggested gaps into the active PPF settings"),
+        ],
+        default="SUGGEST",
+    )
+
+    cloth_prep_contact_gap_factor: bpy.props.FloatProperty(
+        name="Gap Factor",
+        description="Suggested gap = factor × median edge length (world units)",
+        default=0.1,
+        min=0.0,
+        soft_min=0.0,
+        soft_max=1.0,
+        precision=4,
+    )
+
+    cloth_prep_dt_mode: bpy.props.EnumProperty(
+        name="dt",
+        description="Suggest (or apply) a conservative dt based on mesh resolution for stability",
+        items=[
+            ("OFF", "Off", "Do not compute a dt suggestion"),
+            ("SUGGEST", "Suggest", "Report a suggested dt without changing settings"),
+            ("SET", "Set", "Write the suggested dt into the active PPF scene settings"),
+        ],
+        default="SUGGEST",
+    )
+
+    cloth_prep_dt_max_gravity_disp_frac: bpy.props.FloatProperty(
+        name="Max Gravity Displacement",
+        description="Stability heuristic: keep 0.5*|g|*dt^2 ≤ frac × characteristic length (edge/gap)",
+        default=0.1,
+        min=0.0,
+        soft_min=0.0,
+        soft_max=0.5,
+        precision=4,
+    )
+
     ppf_material_preset: bpy.props.EnumProperty(
         name="Preset",
         description="Quick material presets for PPF shell/static friction parameters",
@@ -239,4 +394,18 @@ class AndoSimArtezbuildSettings(bpy.types.PropertyGroup):
         description="Internal state flag",
         default=False,
         options={"HIDDEN"},
+    )
+
+    ppf_baking: bpy.props.BoolProperty(
+        name="Baking",
+        description="Internal state flag for bake-in-progress",
+        default=False,
+        options={"HIDDEN", "SKIP_SAVE"},
+    )
+
+    ppf_has_snapshot: bpy.props.BoolProperty(
+        name="Has Snapshot",
+        description="True when a mesh snapshot is available for Reset Simulation",
+        default=False,
+        options={"HIDDEN", "SKIP_SAVE"},
     )

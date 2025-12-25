@@ -1,7 +1,7 @@
 bl_info = {
-    "name": "AndoSim ArteZbuild",
+    "name": "ArzteZ PPF solver",
     "author": "Moritz",
-    "version": (0, 0, 7),
+    "version": (0, 0, 9, 2),
     "blender": (4, 2, 0),
     "location": "View3D > Sidebar > AndoSim",
     "description": "Unified Ando (CPU) + PPF (GPU) simulation (PPF core integrated)",
@@ -13,10 +13,13 @@ import bpy
 from .operators import (
     ANDOSIM_ARTEZBUILD_OT_ppf_run,
     ANDOSIM_ARTEZBUILD_OT_ppf_stop,
+    ANDOSIM_ARTEZBUILD_OT_ppf_reset_simulation,
     ANDOSIM_ARTEZBUILD_OT_ppf_bake_cache,
+    ANDOSIM_ARTEZBUILD_OT_ppf_cancel_bake,
     ANDOSIM_ARTEZBUILD_OT_ppf_create_pin_handle,
     ANDOSIM_ARTEZBUILD_OT_ppf_grab_pin,
     ANDOSIM_ARTEZBUILD_OT_ppf_clear_grab,
+    ANDOSIM_ARTEZBUILD_OT_prepare_cloth_mesh,
 )
 from .object_properties import AndoSimArtezbuildObjectSettings
 from .properties import AndoSimArtezbuildSettings
@@ -24,6 +27,9 @@ from .properties import AndoSimArtezbuildSettings
 
 _BACKEND_ANDO = "ANDO"
 _BACKEND_PPF = "PPF"
+
+_CLOTH_PREP_DUPLICATE = "DUPLICATE"
+_CLOTH_PREP_DESTRUCTIVE = "DESTRUCTIVE"
 
 
 class AndoSimArtezbuildPrefs(bpy.types.AddonPreferences):
@@ -35,9 +41,23 @@ class AndoSimArtezbuildPrefs(bpy.types.AddonPreferences):
         default=_BACKEND_PPF,
     )
 
+    cloth_prep_mode: bpy.props.EnumProperty(
+        name="Cloth Prep Mode",
+        description="Whether 'Prepare Cloth Mesh' duplicates the object (recommended) or modifies it in-place",
+        items=[
+            (_CLOTH_PREP_DUPLICATE, "Duplicate (Sim Workflow)", "Create a new *_SIM mesh and keep the original"),
+            (_CLOTH_PREP_DESTRUCTIVE, "Destructive", "Remesh the active object in-place"),
+        ],
+        default=_CLOTH_PREP_DUPLICATE,
+    )
+
     def draw(self, ctx):
         layout = self.layout
         layout.prop(self, "solver_backend")
+
+        box = layout.box()
+        box.label(text="Cloth Mesh Prep")
+        box.prop(self, "cloth_prep_mode")
 
 
 def get_backend(ctx) -> str:
@@ -61,10 +81,13 @@ _classes = (
     AndoSimArtezbuildPrefs,
     ANDOSIM_ARTEZBUILD_OT_ppf_run,
     ANDOSIM_ARTEZBUILD_OT_ppf_stop,
+    ANDOSIM_ARTEZBUILD_OT_ppf_reset_simulation,
     ANDOSIM_ARTEZBUILD_OT_ppf_bake_cache,
+    ANDOSIM_ARTEZBUILD_OT_ppf_cancel_bake,
     ANDOSIM_ARTEZBUILD_OT_ppf_create_pin_handle,
     ANDOSIM_ARTEZBUILD_OT_ppf_grab_pin,
     ANDOSIM_ARTEZBUILD_OT_ppf_clear_grab,
+    ANDOSIM_ARTEZBUILD_OT_prepare_cloth_mesh,
     AndoSimArtezbuildObjectSettings,
     AndoSimArtezbuildSettings,
 )

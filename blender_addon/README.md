@@ -12,7 +12,7 @@ It bundles two simulation backends:
    - `./build.sh`
 2. Install in Blender:
    - Edit → Preferences → Extensions → Install from Disk…
-  - Select `dist/andosim_artezbuild-0.0.8.zip`
+  - Select `dist/andosim_artezbuild-0.0.9.2.zip`
    - Enable the extension
 
 ## Supported Platforms
@@ -20,13 +20,6 @@ It bundles two simulation backends:
 - Blender 4.2+
 - Linux x64
 - Blender Python 3.11 (bundled artifacts are `cp311`)
-
-## Rebuilding the PPF wheel (Maintainers)
-
-If you need to rebuild the bundled `ppf_cts_backend` wheel, the wrapper source is vendored in the repo root under `ppf_cts_backend/`.
-
-- Build + copy wheel into `blender_addon/wheels/`: `tools/build_ppf_wheel.sh`
-- Rebuild the extension zip: `./build.sh`
 
 ## Troubleshooting
 

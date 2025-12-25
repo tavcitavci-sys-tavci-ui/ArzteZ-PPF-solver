@@ -1,12 +1,12 @@
 schema_version = "1.0.0"
 id = "andosim_artezbuild"
-version = "0.0.8"
-name = "AndoSim ArteZbuild"
+version = "0.0.9.2"
+name = "ArzteZ PPF solver"
 tagline = "Unified Ando (CPU) + PPF (GPU) simulation"
 maintainer = "Moritz"
 type = "add-on"
 blender_version_min = "4.2.0"
-license = ["MIT"]
+license = ["GPL-3.0-or-later"]
 
 platforms = ["linux-x64"]
 

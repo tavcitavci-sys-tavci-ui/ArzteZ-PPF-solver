@@ -1,49 +1,32 @@
-.DS_Store
-Thumbs.db
-
-# Python
-__pycache__/
-*.py[cod]
-*.pyd
-*.so
-*.dylib
-*.dll
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-coverage.xml
-
-# Local env
 .venv/
-venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Blender
-*.blend1
-*.blend2
-*.blend@
+# Build artifacts
+ando_core_src/build/
+ando_core_src/**/CMakeFiles/
+ando_core_src/**/CMakeCache.txt
+ando_core_src/**/cmake_install.cmake
+ando_core_src/**/Makefile
 
-# Build outputs
+# Packaging artifacts
 dist/
-build/
-**/build/
 
-# Rust / maturin build outputs
-ppf_cts_backend/target/
-ppf-contact-solver/target/
+# Exclude vendored/experimental sources (not part of release repo)
+arcsim/
+research/
 
-# Keep Cargo.lock tracked for reproducible builds
-!ppf-contact-solver/Cargo.lock
+# Blender / OS junk
+*.blend1
+*.blend@
+.DS_Store
 
-# Allow publishing the bundled runtime artifacts for the Blender Extension.
-# (Still keeps other build outputs and caches ignored.)
-!blender_addon/wheels/*.whl
-!blender_addon/ando/ando_barrier_core.py
-!blender_addon/ando/ando_barrier_core*.so
+# Editor/workspace files
+*.code-workspace
 
-# Optionally publish the built extension zip from dist/
-!dist/
-!dist/*.zip
-
-# IDE
-.vscode/
+# Logs / temp
+*.log
+/tmp/

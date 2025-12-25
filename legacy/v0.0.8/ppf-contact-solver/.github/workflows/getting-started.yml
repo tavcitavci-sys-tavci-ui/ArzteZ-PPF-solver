@@ -1,0 +1,59 @@
+# File: getting-started.yml
+# Code: Claude Code and Codex
+# Review: Ryoichi Ando (ryoichi.ando@zozo.com)
+# License: Apache v2.0
+
+name: Getting Started
+
+on:
+  workflow_dispatch:
+
+jobs:
+  headless:
+    runs-on: ppf-contact-solver-NVIDIA
+    timeout-minutes: 60
+
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
+
+      - name: install NVIDIA driver and CUDA toolkit
+        run: |
+          curl -fSsL -O https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.1-1_all.deb
+          sudo dpkg -i cuda-keyring_1.1-1_all.deb
+          sudo apt-get update
+          sudo apt-get -y install cuda-toolkit-12-8
+
+      - name: check GPU
+        run: nvidia-smi
+
+      - name: warmup
+        run: python3 warmup.py --skip-confirmation
+
+      - name: build
+        run: ~/.cargo/bin/cargo build --release
+
+      - name: run headless
+        run: |
+          echo "getting-started" > frontend/.CI
+          export PYTHONPATH=$PWD
+          ~/.local/share/ppf-cts/venv/bin/python examples/headless.py
+
+      - name: Collect results
+        if: success() || failure()
+        run: |
+          echo "Collecting results..."
+          mkdir -p ci
+          if [ -d "/tmp/ci" ]; then
+            rsync -av --exclude='*.bin' --exclude='*.pickle' /tmp/ci/ ./ci/
+          fi
+          echo "## Collected Files:"
+          ls -la ci/ || echo "No files collected"
+
+      - name: Upload artifact
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-getting-started
+          path: ci
+          retention-days: 3

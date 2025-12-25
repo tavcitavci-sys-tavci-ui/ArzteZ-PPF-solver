@@ -1,6 +1,4 @@
-# AndoArteZcontactsolver (Blender Extension)
-
-AndoArteZcontactsolver is a Blender 4.2+ Extension that combines AndoSim’s CPU cloth/shell solver with the PPF GPU contact solver in one workflow.
+# AndoSim ArteZbuild (Blender Extension)
 
 A unified Blender 4.2+ **Extension** that bundles two simulation backends under one UI:
 
@@ -9,21 +7,29 @@ A unified Blender 4.2+ **Extension** that bundles two simulation backends under 
 
 This repo produces an installable zip in `dist/`.
 
-## Downloads
+## What's New
 
-- **Latest (0.0.8)**: `dist/andosim_artezbuild-latest.zip`
-- Versioned zips are also kept in `dist/`.
+### 0.0.9.2 (2025-12-21)
+- **Prepare Cloth Mesh** now reports mesh quality (angles/aspect/non-manifold) and suggests stability-friendly values for **contact gap** and **dt**.
+
+### Version History
+- See [CHANGELOG.md](CHANGELOG.md) for full details.
+- Recent releases:
+   - **0.0.9.2**: mesh quality + gap/dt suggestions for stability.
+   - **0.0.9.1**: initial one-click mesh prep + GPL-3.0-or-later licensing metadata.
+   - **0.0.9**: unified PPF UI improvements; reset + improved bake.
 
 ## Supported Versions
 
 - **Blender**: 4.2+ (tested with Blender 4.5.x LTS)
 - **OS**: Linux x64
+- **Python ABI**: Blender’s bundled Python **3.11** (the shipped binaries/wheels are `cp311`)
 
 ## Runtime Requirements
 
 ### Minimal (Ando CPU backend)
 - Blender 4.2+ on Linux x64
-
+- No separate Python install required (Blender ships Python)
 
 ### PPF GPU backend (additional requirements)
 - NVIDIA GPU (PPF runs on GPU)
@@ -35,11 +41,10 @@ Notes:
 ## Install (Recommended)
 
 1. Build (or download) the extension zip:
-   - Latest: `dist/andosim_artezbuild-latest.zip` (currently 0.0.8)
-   - Versioned: `dist/andosim_artezbuild-0.0.8.zip`
+   - This repo builds: `dist/andosim_artezbuild-0.0.9.2.zip`
 2. In Blender:
    - **Edit → Preferences → Extensions → Install from Disk…**
-   - Select `dist/andosim_artezbuild-latest.zip` (or a versioned zip)
+   - Select `dist/andosim_artezbuild-0.0.9.2.zip`
    - Enable the extension.
 3. Verify it loaded:
    - Open the 3D Viewport sidebar: **View3D → Sidebar → AndoSim**
@@ -134,15 +139,7 @@ If you need to rebuild it locally, you’ll need:
 - `maturin`
 - A working CUDA/NVIDIA environment compatible with the upstream solver
 
-This repo vendors the wheel wrapper source in `ppf_cts_backend/`.
-
-It also vendors the required `ppf-contact-solver/` Rust/CUDA source tree used by the wheel.
-
-Build and copy the wheel into the extension:
-- `tools/build_ppf_wheel.sh`
-
-Then rebuild the extension zip:
-- `./build.sh`
+(Repo used in this workspace: `ppf_cts_backend_build/`.)
 
 ## License
 
