@@ -2,7 +2,7 @@ schema_version = "1.0.0"
 id = "andosim_artezbuild"
 # Blender Extensions requires SemVer (MAJOR.MINOR.PATCH) with optional prerelease/build.
 # Our repo version "0.0.9.2" is represented as SemVer build metadata.
-version = "0.0.9+2"
+version = "0.0.9+3"
 name = "ArzteZ PPF solver"
 tagline = "Unified Ando (CPU) + PPF (GPU) simulation"
 maintainer = "Moritz"

@@ -1,7 +1,7 @@
 bl_info = {
     "name": "ArzteZ PPF solver",
     "author": "Moritz",
-    "version": (0, 0, 9, 2),
+    "version": (0, 0, 9, 3),
     "blender": (4, 2, 0),
     "location": "View3D > Sidebar > AndoSim",
     "description": "Unified Ando (CPU) + PPF (GPU) simulation (PPF core integrated)",
